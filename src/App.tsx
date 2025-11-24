@@ -9,6 +9,7 @@ import {
   ThemeToggle,
   GitManager,
   UpdateManager,
+  Settings,
   Button
 } from '@/components'
 import { useShortcutStore } from '@/stores'
@@ -19,6 +20,7 @@ function App() {
   const store = useShortcutStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [showGitManager, setShowGitManager] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
   const [repository, setRepository] = useState<GitRepository | null>(null)
 
   // Get computed values
@@ -93,6 +95,13 @@ function App() {
             >
               {repository ? '📁 Git' : '📁 Connect Git'}
             </Button>
+            <Button
+              onClick={() => setShowSettings(!showSettings)}
+              variant="secondary"
+              className="text-sm px-3 py-2"
+            >
+              ⚙️ Settings
+            </Button>
             <ThemeToggle className="ml-2" />
           </div>
         </header>
@@ -110,6 +119,16 @@ function App() {
             <UpdateManager
               repository={repository}
               onUpdateComplete={handleUpdateComplete}
+            />
+          </div>
+        )}
+
+        {/* Settings Panel */}
+        {showSettings && (
+          <div className="mb-6">
+            <Settings
+              repository={repository}
+              onRepositoryChange={setRepository}
             />
           </div>
         )}

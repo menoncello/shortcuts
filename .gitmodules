@@ -1,0 +1,3 @@
+[submodule "shortcut-data"]
+	path = shortcut-data
+	url = https://github.com/menoncello/shortcut-data.git

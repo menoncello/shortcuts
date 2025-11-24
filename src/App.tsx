@@ -1,12 +1,25 @@
 import { useEffect, useState } from 'react'
-import { ProgressBar, ShortcutCard, SearchInput, CategoryFilter, EmptyState, ThemeToggle } from '@/components'
+import { invoke } from '@tauri-apps/api/core'
+import {
+  ProgressBar,
+  ShortcutCard,
+  SearchInput,
+  CategoryFilter,
+  EmptyState,
+  ThemeToggle,
+  GitManager,
+  UpdateManager,
+  Button
+} from '@/components'
 import { useShortcutStore } from '@/stores'
-import type { LearningProgress } from '@/types'
+import type { LearningProgress, GitRepository, UpdateResult } from '@/types'
 import './index.css'
 
 function App() {
   const store = useShortcutStore()
   const [searchQuery, setSearchQuery] = useState('')
+  const [showGitManager, setShowGitManager] = useState(false)
+  const [repository, setRepository] = useState<GitRepository | null>(null)
 
   // Get computed values
   const filteredShortcuts = store.getFilteredShortcuts()
@@ -17,7 +30,27 @@ function App() {
   // Initialize data
   useEffect(() => {
     store.loadApps()
+    checkRepositoryStatus()
   }, [])
+
+  const checkRepositoryStatus = async () => {
+    try {
+      const repoInfo = await invoke<GitRepository>('git_get_repository_info')
+      setRepository(repoInfo)
+    } catch (err) {
+      // Repository might not exist yet
+      setRepository(null)
+    }
+  }
+
+  const handleUpdateComplete = (result: UpdateResult) => {
+    // Reload shortcuts after successful update
+    store.loadApps()
+    if (result.success) {
+      // Show success message
+      console.log('Repository updated successfully')
+    }
+  }
 
   // Calculate progress
   const progress: LearningProgress = {
@@ -52,7 +85,16 @@ function App() {
               Master keyboard shortcuts for your favorite applications
             </p>
           </div>
-          <ThemeToggle className="ml-4" />
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => setShowGitManager(!showGitManager)}
+              variant="secondary"
+              className="text-sm px-3 py-2"
+            >
+              {repository ? '📁 Git' : '📁 Connect Git'}
+            </Button>
+            <ThemeToggle className="ml-2" />
+          </div>
         </header>
 
         {/* Progress Bar */}
@@ -60,6 +102,17 @@ function App() {
           progress={progress}
           className="mb-6"
         />
+
+        {/* Git Management Panel */}
+        {showGitManager && (
+          <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <GitManager />
+            <UpdateManager
+              repository={repository}
+              onUpdateComplete={handleUpdateComplete}
+            />
+          </div>
+        )}
 
         {/* Controls */}
         <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">

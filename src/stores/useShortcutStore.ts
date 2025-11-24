@@ -122,8 +122,8 @@ export const useShortcutStore = create<ShortcutStore>((set, get) => ({
       selectedAppId: appId,
       selectedCategory: undefined // Reset category filter when app changes
     })
-    get().loadShortcuts(appId)
-    get().loadCategories(appId)
+    get().loadShortcuts(appId || undefined)
+    get().loadCategories(appId || undefined)
   },
 
   setSelectedCategory: (category) => set({ selectedCategory: category }),
@@ -159,7 +159,7 @@ export const useShortcutStore = create<ShortcutStore>((set, get) => ({
         })
         set({ shortcuts: searchResults })
       } else {
-        get().loadShortcuts(get().selectedAppId)
+        get().loadShortcuts(get().selectedAppId || undefined)
       }
     } catch (err) {
       set({ error: 'Failed to search shortcuts' })
@@ -171,6 +171,6 @@ export const useShortcutStore = create<ShortcutStore>((set, get) => ({
 
   resetFilters: async () => {
     set({ selectedCategory: undefined })
-    await get().loadShortcuts(get().selectedAppId)
+    await get().loadShortcuts(get().selectedAppId || undefined)
   }
 }))

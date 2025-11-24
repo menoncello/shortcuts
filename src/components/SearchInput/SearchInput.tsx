@@ -164,7 +164,6 @@ export const SearchInput: React.FC<SearchInputProps> = ({
       if (showSuggestions && suggestions.length > 0) {
         handleSuggestionClick(suggestions[0].text)
       } else {
-        debouncedSearch.cancel?.()
         onSearch(value)
         if (value.trim()) {
           saveToHistory(value)
@@ -201,9 +200,9 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      debouncedSearch.cancel?.()
+      // No cleanup needed for simple timeout implementation
     }
-  }, [debouncedSearch])
+  }, [])
 
   return (
     <div className={className}>

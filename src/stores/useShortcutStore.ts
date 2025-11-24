@@ -84,9 +84,12 @@ export const useShortcutStore = create<ShortcutStore>((set, get) => ({
           selectedAppId: firstApp.id || null
         })
         get().loadShortcuts(firstApp.id)
+      } else if (appsData.length === 0) {
+        // No apps available, stop loading
+        set({ loading: false })
       }
     } catch (err) {
-      set({ error: 'Failed to load applications' })
+      set({ error: 'Failed to load applications', loading: false })
       console.error('Error loading apps:', err)
     }
   },
